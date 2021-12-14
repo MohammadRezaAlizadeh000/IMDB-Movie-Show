@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="180dp"
+    android:layout_height="270dp"
+    android:layout_margin="10dp"
+    app:cardCornerRadius="10dp"
+    android:animateLayoutChanges="true"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true">
+
+        <ImageView
+            android:id="@+id/moviePoster"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            tools:src="@tools:sample/avatars" />
+
+        <LinearLayout
+            android:id="@+id/dataBackground"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+
+            android:animateLayoutChanges="true"
+            android:background="@drawable/layout_background"
+            android:orientation="vertical"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/movieYear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="2021"
+                    android:textColor="@color/white"
+
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/movieRate"
+
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:drawableEnd="@drawable/ic_baseline_star_24"
+                    android:drawablePadding="3dp"
+
+                    android:gravity="center_vertical|end"
+                    android:layout_weight="1"
+                    android:text="(123377) 4.9"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/movieTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_margin="8dp"
+
+                android:textAlignment="center"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="@string/medium_text_test"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/movieCrew"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:text="@string/medium_text_test"
+                android:textSize="12sp"
+                android:textColor="@color/white"
+
+                android:drawableStart="@drawable/ic_baseline_crew_24"
+                android:drawablePadding="4dp"
+
+                android:ellipsize="end"
+                android:maxLines="2"
+
+                android:gravity="center_vertical"
+                android:visibility="gone"
+
+                android:layout_margin="8dp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

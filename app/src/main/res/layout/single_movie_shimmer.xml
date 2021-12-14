@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:clickable="true"
+    android:focusable="true"
+    android:layoutDirection="rtl">
+
+    <View
+        android:id="@+id/mainPosterShimmer"
+        android:layout_width="0dp"
+        android:layout_height="500dp"
+
+        android:background="@color/colorSecondary"
+        android:scaleType="centerCrop"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.utils.widget.ImageFilterView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+
+        android:background="@drawable/transparent_cover"
+
+        app:layout_constraintBottom_toBottomOf="@id/mainPosterShimmer"
+        app:layout_constraintEnd_toEndOf="@id/mainPosterShimmer"
+        app:layout_constraintStart_toStartOf="@id/mainPosterShimmer"
+        app:layout_constraintTop_toTopOf="@id/mainPosterShimmer" />
+
+    <View
+        android:id="@+id/movieTitleShimmer"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+
+        android:layout_margin="10dp"
+        android:background="@color/colorSecondaryVariant"
+
+        app:layout_constraintBottom_toBottomOf="@id/mainPosterShimmer"
+        app:layout_constraintEnd_toEndOf="@id/mainPosterShimmer"
+        app:layout_constraintStart_toStartOf="@id/mainPosterShimmer"
+        app:layout_constraintTop_toTopOf="@id/mainPosterShimmer"
+        app:layout_constraintVertical_bias="0.8" />
+
+    <View
+        android:id="@+id/movieRateShimmer"
+        android:layout_width="90dp"
+        android:layout_height="25dp"
+
+        android:layout_marginTop="15dp"
+        android:background="@color/colorSecondaryVariant"
+
+        app:layout_constraintEnd_toEndOf="@id/movieTitleShimmer"
+        app:layout_constraintTop_toBottomOf="@id/movieTitleShimmer" />
+
+    <View
+        android:id="@+id/movieReleaseDateShimmer"
+        android:layout_width="90dp"
+        android:layout_height="25dp"
+
+
+        android:background="@color/colorSecondaryVariant"
+
+        app:layout_constraintBottom_toBottomOf="@id/movieRateShimmer"
+        app:layout_constraintStart_toStartOf="@id/movieTitleShimmer"
+        app:layout_constraintTop_toTopOf="@id/movieRateShimmer" />
+
+    <View
+        android:id="@+id/movieGenresShimmer"
+        android:layout_width="0dp"
+        android:layout_height="25dp"
+
+        android:layout_marginTop="8dp"
+
+        android:background="@color/colorSecondaryVariant"
+
+        app:layout_constraintEnd_toEndOf="@id/movieTitleShimmer"
+        app:layout_constraintStart_toStartOf="@id/movieTitleShimmer"
+        app:layout_constraintTop_toBottomOf="@id/movieRateShimmer" />
+
+    <View
+        android:id="@+id/movieLanguagesShimmer"
+        android:layout_width="0dp"
+        android:layout_height="25dp"
+
+        android:layout_marginTop="8dp"
+
+        android:background="@color/colorSecondaryVariant"
+
+        app:layout_constraintEnd_toEndOf="@id/movieTitleShimmer"
+        app:layout_constraintStart_toStartOf="@id/movieTitleShimmer"
+        app:layout_constraintTop_toBottomOf="@id/movieGenresShimmer" />
+
+    <View
+        android:id="@+id/movieCountriesShimmer"
+        android:layout_width="0dp"
+        android:layout_height="25dp"
+
+        android:layout_marginTop="8dp"
+
+        android:background="@color/colorSecondaryVariant"
+
+        app:layout_constraintEnd_toEndOf="@id/movieTitleShimmer"
+        app:layout_constraintStart_toStartOf="@id/movieTitleShimmer"
+        app:layout_constraintTop_toBottomOf="@id/movieLanguagesShimmer" />
+
+    <View
+        android:id="@+id/movieCrewShimmer"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+
+        android:layout_marginTop="8dp"
+
+        android:background="@color/colorSecondaryVariant"
+
+        app:layout_constraintEnd_toEndOf="@id/movieTitleShimmer"
+        app:layout_constraintStart_toStartOf="@id/movieTitleShimmer"
+        app:layout_constraintTop_toBottomOf="@id/movieCountriesShimmer" />
+
+    <View
+        android:id="@+id/descriptionShimmer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+
+
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+
+        android:background="@color/colorSecondaryVariant"
+
+        app:layout_constraintEnd_toEndOf="@id/movieTitleShimmer"
+        app:layout_constraintStart_toStartOf="@id/movieTitleShimmer"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/movieCrewShimmer" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
