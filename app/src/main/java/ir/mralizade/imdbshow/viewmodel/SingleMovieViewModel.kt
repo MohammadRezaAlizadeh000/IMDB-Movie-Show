@@ -11,6 +11,8 @@ import ir.mralizade.imdbshow.data.database.entity.SingleMoviesEntity
 import ir.mralizade.imdbshow.model.singlemovie.SingleMovieResponseModel
 import ir.mralizade.imdbshow.utils.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
@@ -22,7 +24,7 @@ class SingleMovieViewModel @Inject constructor(
     private val repository: Repository
 ) : AndroidViewModel(application) {
 
-    val singleMovieResponse = MutableLiveData<AppState<SingleMoviesEntity>>()
+    val singleMovieResponseFlow = MutableSharedFlow<AppState<SingleMoviesEntity>>()
 
     fun getMovieData(movieId: String) {
         val funName = Exception().stackTrace[0].methodName
@@ -116,7 +118,7 @@ class SingleMovieViewModel @Inject constructor(
         val funName = Exception().stackTrace[0].methodName
         log(APP_STATE_TAG, funName)
 
-        singleMovieResponse.value = appState
+        singleMovieResponseFlow.tryEmit(appState)
     }
 
 }

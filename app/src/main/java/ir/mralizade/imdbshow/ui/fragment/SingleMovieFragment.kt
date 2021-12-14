@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import dagger.hilt.android.AndroidEntryPoint
@@ -13,9 +14,14 @@ import ir.mralizade.imdbshow.data.database.entity.SingleMoviesEntity
 import ir.mralizade.imdbshow.databinding.SingleMovieFragmentBinding
 import ir.mralizade.imdbshow.utils.*
 import ir.mralizade.imdbshow.viewmodel.SingleMovieViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SingleMovieFragment: Fragment() {
+class SingleMovieFragment : Fragment() {
 
     private var _binding: SingleMovieFragmentBinding? = null
     private val binding get() = _binding!!
@@ -36,6 +42,8 @@ class SingleMovieFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initObservables()
+
+
     }
 
     private fun getMovieIdArgument() = arguments?.getString(MOVIE_ID)!!
@@ -62,7 +70,7 @@ class SingleMovieFragment: Fragment() {
     private fun createMovieCrew(directors: String, writers: String) = "$directors $writers"
 
     private fun activeLoadingPage() {
-        with(binding){
+        with(binding) {
             singlePageShimmer.visibility = View.VISIBLE
             singlePageShimmer.startShimmer()
             singlePageScroll.visibility = View.GONE
@@ -78,19 +86,37 @@ class SingleMovieFragment: Fragment() {
     }
 
     private fun initObservables() {
-        viewModel.singleMovieResponse.observe(viewLifecycleOwner) { response ->
-            when(response) {
-                is AppState.Success -> {
-                    setPageData(response.data!!)
-                    inActiveLoadingPage()
+//        viewModel.singleMovieResponse.observe(viewLifecycleOwner) { response ->
+//            when(response) {
+//                is AppState.Success -> {
+//                    setPageData(response.data!!)
+//                    inActiveLoadingPage()
+//                }
+//                is AppState.Error -> {
+//                    inActiveLoadingPage()
+//                    toast(response.message.toString())
+//                }
+//                is AppState.Loading -> activeLoadingPage()
+//                else -> log(SINGLE_MOVIE_FRAGMENT_TAG, "Something goes wrong in states")
+//            }
+//        }
+
+        lifecycleScope.launchWhenCreated {
+            viewModel.singleMovieResponseFlow.collect { response ->
+                when (response) {
+                    is AppState.Success -> {
+                        setPageData(response.data!!)
+                        inActiveLoadingPage()
+                    }
+                    is AppState.Error -> {
+                        inActiveLoadingPage()
+                        toast(response.message.toString())
+                    }
+                    is AppState.Loading -> activeLoadingPage()
                 }
-                is AppState.Error -> {
-                    inActiveLoadingPage()
-                    toast(response.message.toString())
-                }
-                is AppState.Loading -> activeLoadingPage()
-                else -> log(SINGLE_MOVIE_FRAGMENT_TAG, "Something goes wrong in states")
             }
         }
+
+
     }
 }

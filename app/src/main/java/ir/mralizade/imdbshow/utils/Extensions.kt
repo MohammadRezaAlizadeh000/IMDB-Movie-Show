@@ -48,11 +48,17 @@ fun <T> AndroidViewModel.handleCatchBlock(
     return AppState.Error(message = getApplication<Application>().getString(R.string.connection_error))
 }
 
-fun <T> AndroidViewModel.handleNoInternetConnection(name: String): AppState<T> {
+fun AndroidViewModel.catchBlockLogs(
+    exception: Exception,
+    name: String
+) {
+    log(RESPONSE_TAG, "response = catch $name")
+    log(RESPONSE_TAG, exception.stackTrace.contentToString())
+    log(RESPONSE_TAG, exception.localizedMessage)
+    log(RESPONSE_TAG, exception.suppressedExceptions.toString())
+    log(RESPONSE_TAG, exception.message.toString())
+    log(RESPONSE_TAG, exception.cause.toString())
 
-    log(APP_STATE_TAG, "no Internet connection in $name")
-
-    return AppState.Error(message = getApplication<Application>().getString(R.string.check_internet_status))
 }
 
 fun log(tag: String, message: String) {
@@ -72,4 +78,12 @@ fun AppCompatActivity.transactionFragment() {
         .replace(R.id.navHostFragmentActivityMain, PopularMoviesListFragment())
         .addToBackStack(null)
         .commit()
+}
+
+fun Context.systemMessages(type: String): String {
+    return when(type) {
+        SYSTEM_ERROR -> this.getString(R.string.connection_error)
+        INTERNET_CONNECTION_ERROR -> this.getString(R.string.check_internet_status)
+        else -> {"NULL"}
+    }
 }

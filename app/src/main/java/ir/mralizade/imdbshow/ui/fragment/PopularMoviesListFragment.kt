@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import ir.mralizade.imdbshow.data.database.entity.PopularMovieEntity
 import ir.mralizade.imdbshow.databinding.PopularMovieListFragmentBinding
@@ -14,6 +15,11 @@ import ir.mralizade.imdbshow.ui.adapter.PopularMoviesRecyclerViewAdapter
 import ir.mralizade.imdbshow.ui.adapter.clicklistener.OnPopularMoviesClickListener
 import ir.mralizade.imdbshow.utils.*
 import ir.mralizade.imdbshow.viewmodel.PopularMoviesViewModel
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class PopularMoviesListFragment: Fragment(), OnPopularMoviesClickListener {
@@ -85,18 +91,36 @@ class PopularMoviesListFragment: Fragment(), OnPopularMoviesClickListener {
     }
 
     private fun initObservables() {
-        viewModel.popularMoviesResponse.observe(viewLifecycleOwner) { response ->
-            when(response) {
-                is AppState.Success -> {
-                    inActiveLoadingMode()
-                    initRecyclerView(response.data!!)
+//        viewModel.popularMoviesResponse.observe(viewLifecycleOwner) { response ->
+//            when(response) {
+//                is AppState.Success -> {
+//                    inActiveLoadingMode()
+//                    initRecyclerView(response.data!!)
+//                }
+//                is AppState.Error -> {
+//                    inActiveLoadingMode()
+//                    toast(response.message.toString())
+//                }
+//                is AppState.Loading -> activeLoadingMode()
+//                else -> log(MOVIES_LIST_FRAGMENT_TAG, "Exactly How O_o!!!")
+//            }
+//        }
+
+
+        lifecycleScope.launchWhenCreated {
+            viewModel.popularMoviesResponseFlow
+                .collect { response ->
+                when(response) {
+                    is AppState.Loading -> activeLoadingMode()
+                    is AppState.Success -> {
+                        inActiveLoadingMode()
+                        initRecyclerView(response.data!!)
+                    }
+                    is AppState.Error -> {
+                        inActiveLoadingMode()
+                        toast(response.message.toString())
+                    }
                 }
-                is AppState.Error -> {
-                    inActiveLoadingMode()
-                    toast(response.message.toString())
-                }
-                is AppState.Loading -> activeLoadingMode()
-                else -> log(MOVIES_LIST_FRAGMENT_TAG, "Exactly How O_o!!!")
             }
         }
     }

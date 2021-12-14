@@ -8,10 +8,14 @@ import ir.mralizade.imdbshow.data.Repository
 import ir.mralizade.imdbshow.data.database.entity.PopularMovieEntity
 import ir.mralizade.imdbshow.model.popularmovies.PopularMoviesResponseModel
 import ir.mralizade.imdbshow.utils.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,52 +24,69 @@ class PopularMoviesViewModel @Inject constructor(
     private val repository: Repository
 ) : AndroidViewModel(application) {
 
-    val popularMoviesResponse = MutableLiveData<AppState<MutableList<PopularMovieEntity>>>()
+    var funName = ""
+    val popularMoviesResponseFlow = MutableSharedFlow<AppState<MutableList<PopularMovieEntity>>>()
 
     fun getAllVideo(startPoint: Int) {
-        val funName = Exception().stackTrace[0].methodName
+        funName = Exception().stackTrace[0].methodName
         log(APP_STATE_TAG, funName)
 
-        popularMoviesResponse.value = AppState.Loading()
-
         viewModelScope.launch {
-            try {
-                val dataList = getDataFromDatabase(startPoint)
 
-                if (dataList.isNotEmpty()) initLiveData(dataList)
-                else callRequest()
+            initLiveData(mutableListOf(), AppState.APP_STATE_LOADING, systemMessages(""))
+
+            try {
+
+                val movieData = getDataFromDatabase(startPoint)
+                if (movieData.isNotEmpty())
+                    initLiveData(movieData, AppState.APP_STATE_SUCCESS, systemMessages(""))
+                else {
+                    val serverData = getDataFromServer()
+                    if (serverData != null) {
+                        val moviesData = convertDataToEntity(serverData)
+                        insertDataToDatabase(moviesData)
+                        val finalData = getDataFromDatabase(startPoint)
+                        initLiveData(finalData, AppState.APP_STATE_SUCCESS, systemMessages(""))
+                    }
+                }
 
             } catch (e: Exception) {
-                popularMoviesResponse.value = handleCatchBlock(e, funName)
+                funName = Exception().stackTrace[0].methodName
+                log(APP_STATE_TAG, funName)
+                initLiveData(
+                    mutableListOf(),
+                    AppState.APP_STATE_ERROR,
+                    systemMessages(SYSTEM_ERROR)
+                )
+                catchBlockLogs(e, funName)
             }
         }
     }
 
-    private suspend fun callRequest() {
-        val funName = Exception().stackTrace[0].methodName
-        log(APP_STATE_TAG, funName)
 
-        if (hasInternetConnection()) {
-            val response = repository.remote.getPopularMovies()
-            if (response.body() != null) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    val entityData = convertDataToEntity(response.body()!!)
-                    insertDataToDatabase(entityData)
-                    val finalData = getDataFromDatabase(0)
-                    initLiveData(finalData)
-                }
-            } else
-                popularMoviesResponse.value = AppState.Error(message = getApplication<Application>().getString(
-                    R.string.connection_error))
-        } else {
-            popularMoviesResponse.value = handleNoInternetConnection(funName)
+    private suspend fun getDataFromServer(): PopularMoviesResponseModel? {
+        return withContext(Dispatchers.IO) {
+            if (hasInternetConnection()) {
+                val response = repository.remote.getPopularMovies()
+
+                if (isServerResponseSuccess(response.body()))
+                    return@withContext response.body()
+                else
+                    initLiveData(mutableListOf(), AppState.APP_STATE_ERROR, systemMessages(SYSTEM_ERROR))
+            } else {
+                initLiveData(mutableListOf(), AppState.APP_STATE_ERROR, systemMessages(INTERNET_CONNECTION_ERROR))
+            }
+            return@withContext null
         }
     }
+
+    private suspend fun isServerResponseSuccess(response: PopularMoviesResponseModel?) =
+        withContext(Dispatchers.Default) { return@withContext response != null }
 
     private suspend fun convertDataToEntity(
         mainData: PopularMoviesResponseModel
     ): MutableList<PopularMovieEntity> {
-        val funName = Exception().stackTrace[0].methodName
+        funName = Exception().stackTrace[0].methodName
         log(APP_STATE_TAG, funName)
 
         return withContext(Dispatchers.Default) {
@@ -108,12 +129,26 @@ class PopularMoviesViewModel @Inject constructor(
         }
     }
 
-    private suspend fun initLiveData(finalData: MutableList<PopularMovieEntity>) {
+    private suspend fun initLiveData(
+        finalData: MutableList<PopularMovieEntity>,
+        appState: String,
+        message: String
+    ) {
         val funName = Exception().stackTrace[0].methodName
         log(APP_STATE_TAG, funName)
 
         withContext(Dispatchers.Main) {
-            popularMoviesResponse.value = AppState.Success(finalData)
+            when (appState) {
+                AppState.APP_STATE_SUCCESS -> {
+                    popularMoviesResponseFlow.emit(AppState.Success(finalData))
+                }
+                AppState.APP_STATE_ERROR -> {
+                    popularMoviesResponseFlow.emit(AppState.Error(mutableListOf(), message))
+                }
+                AppState.APP_STATE_LOADING -> {
+                    popularMoviesResponseFlow.emit(AppState.Error(mutableListOf(), message))
+                }
+            }
         }
     }
 
