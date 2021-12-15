@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
 import ir.mralizade.imdbshow.R
+import ir.mralizade.imdbshow.data.database.entity.SingleMoviesEntity
 import ir.mralizade.imdbshow.ui.fragment.PopularMoviesListFragment
 import java.lang.Exception
 
@@ -86,4 +87,8 @@ fun Context.systemMessages(type: String): String {
         INTERNET_CONNECTION_ERROR -> this.getString(R.string.check_internet_status)
         else -> {"NULL"}
     }
+}
+
+fun <T> SingleMoviesEntity.mapTo(): SingleMoviesEntity {
+    TODO()
 }

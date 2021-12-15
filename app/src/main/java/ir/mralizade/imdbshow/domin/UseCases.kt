@@ -4,7 +4,9 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import ir.mralizade.imdbshow.data.LocalDataSource
 import ir.mralizade.imdbshow.data.Repository
+import ir.mralizade.imdbshow.data.RequestResponse
 import ir.mralizade.imdbshow.data.database.entity.PopularMovieEntity
 import ir.mralizade.imdbshow.model.popularmovies.PopularMoviesResponseModel
 import ir.mralizade.imdbshow.utils.*
@@ -13,12 +15,29 @@ import kotlinx.coroutines.withContext
 
 var funName = ""
 
+suspend inline fun <reified T : Any?> baseFun(repository: Repository, block: LocalDataSource.() -> T): T? {
+    val l = repository.local.block()
+    return if (l == null) {
+        callRequest()
+        null
+    } else
+        l
+}
+
+suspend fun callRequest() {
+
+}
+
 // check internet status connect to repository - call request - get data - return to view model
 suspend fun getPopularMovies(
     repository: Repository,
     startPoint: Int = 0,
     context: Context
 ): (data: List<PopularMovieEntity>?, appState: String, message: String) -> Unit {
+
+    baseFun(repository) {
+        getAllMovies(startPoint)
+    }
 
     val moviesData = getDataFromDatabase(repository, startPoint)
     return if (moviesData.isEmpty()) {
@@ -111,3 +130,30 @@ private suspend fun convertServerDataToEntity(rawData: PopularMoviesResponseMode
         return@withContext dataList
     }
 }
+
+
+
+
+
+
+class DFDF: RequestResponse<AppState<*>> {
+
+    override fun getFromLocal(data: AppState<*>?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getFromRemote(data: AppState<*>?) {
+        TODO("Not yet implemented")
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
