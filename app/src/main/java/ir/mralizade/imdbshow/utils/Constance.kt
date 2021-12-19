@@ -26,3 +26,8 @@ const val MINIMUM_REQUEST_PERIOD_TIME = "12"
 const val MAXIMUM_REQUEST_PERIOD_TIME = "13"
 
 const val WORKER_LOG = "WORKER_LOG"
+
+
+// Request names
+const val POPULAR_MOVIES = "POPULAR_MOVIES"
+const val SINGLE_MOVIE = "SINGLE_MOVIE"

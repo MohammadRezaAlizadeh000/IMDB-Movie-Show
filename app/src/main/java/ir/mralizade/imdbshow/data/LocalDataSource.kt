@@ -11,6 +11,8 @@ class LocalDataSource @Inject constructor(
     private val singleMovieDAO: SingleMovieDAO
 ) {
 
+
+
     suspend fun insertMovie(popularMovie: List<PopularMovieEntity>) = moviesDAO.insertMovie(popularMovie)
     suspend fun getAllMovies(startPoint: Int) = moviesDAO.getAllMovies(startPoint)
     suspend fun clearDatabase() = moviesDAO.clearDatabase()

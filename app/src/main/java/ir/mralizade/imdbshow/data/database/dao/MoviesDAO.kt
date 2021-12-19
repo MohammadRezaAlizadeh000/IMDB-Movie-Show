@@ -5,6 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import ir.mralizade.imdbshow.data.database.entity.PopularMovieEntity
+import ir.mralizade.imdbshow.utils.AppState
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MoviesDAO {

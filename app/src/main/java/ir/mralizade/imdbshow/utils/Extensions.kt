@@ -88,7 +88,3 @@ fun Context.systemMessages(type: String): String {
         else -> {"NULL"}
     }
 }
-
-fun <T> SingleMoviesEntity.mapTo(): SingleMoviesEntity {
-    TODO()
-}

@@ -55,12 +55,12 @@ class PopularMoviesListFragment: Fragment(), OnPopularMoviesClickListener {
     }
 
     private fun refreshPage() {
-        viewModel.refreshPageData()
+//        viewModel.refreshPageData()
         recyclerViewAdapter.refreshList()
     }
 
     private fun getPopularMovies(startPoint: Int) {
-        viewModel.getAllVideo(startPoint)
+        viewModel.getPopularMovies(startPoint)
     }
 
     private fun openVideo(movieId: String) {
@@ -70,8 +70,8 @@ class PopularMoviesListFragment: Fragment(), OnPopularMoviesClickListener {
 
     }
 
-    private fun initRecyclerView(dataList: MutableList<PopularMovieEntity>) {
-        recyclerViewAdapter.setDate(dataList)
+    private fun initRecyclerView(dataList: List<PopularMovieEntity>) {
+        recyclerViewAdapter.setDate(dataList.toMutableList())
         binding.moviesRecyclerView.adapter = recyclerViewAdapter
     }
 
@@ -107,7 +107,7 @@ class PopularMoviesListFragment: Fragment(), OnPopularMoviesClickListener {
 //        }
 
 
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             viewModel.popularMoviesResponseFlow
                 .collect { response ->
                 when(response) {

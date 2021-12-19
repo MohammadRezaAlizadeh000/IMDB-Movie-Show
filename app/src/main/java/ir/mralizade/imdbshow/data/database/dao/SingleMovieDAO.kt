@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import ir.mralizade.imdbshow.data.database.entity.SingleMoviesEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SingleMovieDAO {
@@ -13,7 +14,7 @@ interface SingleMovieDAO {
     suspend fun insertSingleMovie(singleMovie: SingleMoviesEntity)
 
     @Query("SELECT * FROM single_movies WHERE movieId=:id")
-    suspend fun getSingleMovie(id: String): SingleMoviesEntity
+    suspend fun getSingleMovie(id: String): List<SingleMoviesEntity>
 
     @Query("DELETE FROM single_movies WHERE movieId=:id")
     suspend fun clearMovieFromDatabase(id: String)

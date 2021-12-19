@@ -33,7 +33,7 @@ class SingleMovieFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        viewModel.getMovieData(getMovieIdArgument())
+        viewModel.getSingleMovieData(getMovieIdArgument())
 
         _binding = SingleMovieFragmentBinding.inflate(inflater, container, false)
         return binding.root
