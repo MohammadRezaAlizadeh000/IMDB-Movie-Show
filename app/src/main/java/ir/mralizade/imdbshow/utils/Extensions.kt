@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
 import ir.mralizade.imdbshow.R
-import ir.mralizade.imdbshow.data.database.entity.SingleMoviesEntity
 import ir.mralizade.imdbshow.ui.fragment.PopularMoviesListFragment
 import java.lang.Exception
 
@@ -37,7 +36,7 @@ fun AndroidViewModel.hasInternetConnection(): Boolean {
 fun <T> AndroidViewModel.handleCatchBlock(
     exception: Exception,
     name: String
-): AppState<T> {
+): NetworkResponseState<T> {
 
     log(RESPONSE_TAG, "response = catch $name")
     log(RESPONSE_TAG, exception.stackTrace.contentToString())
@@ -46,7 +45,7 @@ fun <T> AndroidViewModel.handleCatchBlock(
     log(RESPONSE_TAG, exception.message.toString())
     log(RESPONSE_TAG, exception.cause.toString())
 
-    return AppState.Error(message = getApplication<Application>().getString(R.string.connection_error))
+    return NetworkResponseState.Error(message = getApplication<Application>().getString(R.string.connection_error))
 }
 
 fun AndroidViewModel.catchBlockLogs(

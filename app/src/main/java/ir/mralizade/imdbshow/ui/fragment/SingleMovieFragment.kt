@@ -14,11 +14,7 @@ import ir.mralizade.imdbshow.data.database.entity.SingleMoviesEntity
 import ir.mralizade.imdbshow.databinding.SingleMovieFragmentBinding
 import ir.mralizade.imdbshow.utils.*
 import ir.mralizade.imdbshow.viewmodel.SingleMovieViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SingleMovieFragment : Fragment() {
@@ -104,15 +100,15 @@ class SingleMovieFragment : Fragment() {
         lifecycleScope.launchWhenCreated {
             viewModel.singleMovieResponseFlow.collect { response ->
                 when (response) {
-                    is AppState.Success -> {
+                    is NetworkResponseState.Success -> {
                         setPageData(response.data!!)
                         inActiveLoadingPage()
                     }
-                    is AppState.Error -> {
+                    is NetworkResponseState.Error -> {
                         inActiveLoadingPage()
                         toast(response.message.toString())
                     }
-                    is AppState.Loading -> activeLoadingPage()
+                    is NetworkResponseState.Loading -> activeLoadingPage()
                 }
             }
         }

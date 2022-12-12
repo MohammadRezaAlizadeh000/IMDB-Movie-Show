@@ -1,15 +1,15 @@
 package ir.mralizade.imdbshow.domin
 
-import ir.mralizade.imdbshow.data.Repository
+import ir.mralizade.imdbshow.data.RepositoryImpl
 import ir.mralizade.imdbshow.data.database.entity.PopularMovieEntity
-import ir.mralizade.imdbshow.utils.AppState
+import ir.mralizade.imdbshow.utils.NetworkResponseState
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetMoviesUseCaseImpl @Inject constructor(
-    private val repository: Repository
+    private val repository: RepositoryImpl
 ): GetPopularMoviesUseCase {
 
-    override suspend fun getPopularMovies(startPoint: Int): Flow<AppState<List<PopularMovieEntity>>> =
-        repository.getPopularMovies(startPoint)
+    override suspend fun getPopularMovies(startPoint: Int, isOnline: Boolean): NetworkResponseState<List<PopularMovieEntity>> =
+        repository.getPopularMovies(startPoint, isOnline = isOnline)
 }

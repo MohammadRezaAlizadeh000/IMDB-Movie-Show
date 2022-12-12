@@ -8,30 +8,53 @@ import ir.mralizade.imdbshow.domin.GetMoviesUseCaseImpl
 import ir.mralizade.imdbshow.model.popularmovies.PopularMoviesResponseModel
 import ir.mralizade.imdbshow.utils.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class PopularMoviesViewModel @Inject constructor(
-    application: Application,
     private val useCase: GetMoviesUseCaseImpl
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
-    var funName = ""
-    val popularMoviesResponseFlow = MutableStateFlow<AppState<List<PopularMovieEntity>>>(AppState.Loading())
+    private var job: Job? = null
 
-    fun getPopularMovies(startPoint: Int) {
-        viewModelScope.launch {
-            useCase.getPopularMovies(startPoint).collect { data ->
-                popularMoviesResponseFlow.value = data
-            }
+    data class PopularMoviesData(
+        val message: String? = null,
+        override val errorMessage: String? = null,
+        override val data: List<PopularMovieEntity>? = null,
+        override val page: Int? = null
+    ) : BaseViewModelResponseData<List<PopularMovieEntity>>
+
+    private val _popularMoviesResponseFlow = MutableStateFlow(PopularMoviesData())
+    val popularMoviesResponseFlow: StateFlow<PopularMoviesData> = _popularMoviesResponseFlow
+
+    fun getPopularMovies(startPoint: Int, isOnline: Boolean) {
+        job = viewModelScope.launch {
+            _popularMoviesResponseFlow.value =
+                when (val response = useCase.getPopularMovies(startPoint, isOnline)) {
+                    is NetworkResponseState.Success -> PopularMoviesData(data = response.data)
+                    is NetworkResponseState.Loading -> PopularMoviesData(message = response.message)
+                    else -> PopularMoviesData(errorMessage = response.message)
+                }
         }
+    }
+
+    fun clearPopularResponseMessage() {
+        _popularMoviesResponseFlow.update {
+            it.copy(errorMessage = null, message = null)
+        }
+    }
+
+    override fun onCleared() {
+        job?.cancel()
+        super.onCleared()
     }
 
 //    fun getAllVideo(startPoint: Int) {
@@ -88,36 +111,6 @@ class PopularMoviesViewModel @Inject constructor(
 //        }
 //    }
 
-    private suspend fun isServerResponseSuccess(response: PopularMoviesResponseModel?) =
-        withContext(Dispatchers.Default) { return@withContext response != null }
-
-    private suspend fun convertDataToEntity(
-        mainData: PopularMoviesResponseModel
-    ): MutableList<PopularMovieEntity> {
-        funName = Exception().stackTrace[0].methodName
-        log(APP_STATE_TAG, funName)
-
-        return withContext(Dispatchers.Default) {
-            val dataList = mutableListOf<PopularMovieEntity>()
-
-            mainData.items?.forEach { data ->
-                dataList.add(
-                    PopularMovieEntity(
-                        data.id!!,
-                        data.rank!!,
-                        data.title!!,
-                        data.year!!,
-                        data.image!!,
-                        data.crew!!,
-                        data.imDbRating!!,
-                        data.imDbRatingCount!!
-                    )
-                )
-            }
-            return@withContext dataList
-        }
-    }
-
 //    private suspend fun insertDataToDatabase(movieDataList: MutableList<PopularMovieEntity>) {
 //        val funName = Exception().stackTrace[0].methodName
 //        log(APP_STATE_TAG, funName)
@@ -137,28 +130,6 @@ class PopularMoviesViewModel @Inject constructor(
 //        }
 //    }
 
-    private suspend fun initLiveData(
-        finalData: MutableList<PopularMovieEntity>,
-        appState: String,
-        message: String
-    ) {
-        val funName = Exception().stackTrace[0].methodName
-        log(APP_STATE_TAG, funName)
-
-        withContext(Dispatchers.Main) {
-            when (appState) {
-                AppState.APP_STATE_SUCCESS -> {
-                    popularMoviesResponseFlow.emit(AppState.Success(finalData))
-                }
-                AppState.APP_STATE_ERROR -> {
-                    popularMoviesResponseFlow.emit(AppState.Error(mutableListOf(), message))
-                }
-                AppState.APP_STATE_LOADING -> {
-                    popularMoviesResponseFlow.emit(AppState.Error(mutableListOf(), message))
-                }
-            }
-        }
-    }
 
 //    fun refreshPageData() {
 //        viewModelScope.launch {

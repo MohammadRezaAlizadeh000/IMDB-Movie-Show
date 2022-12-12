@@ -15,30 +15,15 @@ import ir.mralizade.imdbshow.ui.adapter.PopularMoviesRecyclerViewAdapter
 import ir.mralizade.imdbshow.ui.adapter.clicklistener.OnPopularMoviesClickListener
 import ir.mralizade.imdbshow.utils.*
 import ir.mralizade.imdbshow.viewmodel.PopularMoviesViewModel
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class PopularMoviesListFragment: Fragment(), OnPopularMoviesClickListener {
-
-    private var _binding: PopularMovieListFragmentBinding? = null
-    private val binding get() = _binding!!
+class PopularMoviesListFragment: BaseFragment<PopularMovieListFragmentBinding>(PopularMovieListFragmentBinding::inflate)
+    , OnPopularMoviesClickListener {
 
     private val viewModel: PopularMoviesViewModel by viewModels()
     private val recyclerViewAdapter by lazy { PopularMoviesRecyclerViewAdapter(this) }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        getPopularMovies(0)
-        _binding = PopularMovieListFragmentBinding.inflate(inflater, container, false)
-        return binding.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -50,8 +35,6 @@ class PopularMoviesListFragment: Fragment(), OnPopularMoviesClickListener {
                 getPopularMovies(0)
             }
         }
-
-        initObservables()
     }
 
     private fun refreshPage() {
@@ -60,7 +43,21 @@ class PopularMoviesListFragment: Fragment(), OnPopularMoviesClickListener {
     }
 
     private fun getPopularMovies(startPoint: Int) {
-        viewModel.getPopularMovies(startPoint)
+        context?.let { mContext ->
+            viewModel.getPopularMovies(startPoint, mContext.hasInternetConnection())
+        }
+
+        flowLife(viewModel.popularMoviesResponseFlow) { response ->
+            response.data?.let {
+                inActiveLoadingMode()
+                initRecyclerView(response.data)
+            }
+
+            response.errorMessage?.let {
+                inActiveLoadingMode()
+                toast(it)
+            }
+        }
     }
 
     private fun openVideo(movieId: String) {
@@ -87,41 +84,6 @@ class PopularMoviesListFragment: Fragment(), OnPopularMoviesClickListener {
         with(binding){
             moviesRecyclerView.hideShimmer()
             refreshPopularMovie.isRefreshing = false
-        }
-    }
-
-    private fun initObservables() {
-//        viewModel.popularMoviesResponse.observe(viewLifecycleOwner) { response ->
-//            when(response) {
-//                is AppState.Success -> {
-//                    inActiveLoadingMode()
-//                    initRecyclerView(response.data!!)
-//                }
-//                is AppState.Error -> {
-//                    inActiveLoadingMode()
-//                    toast(response.message.toString())
-//                }
-//                is AppState.Loading -> activeLoadingMode()
-//                else -> log(MOVIES_LIST_FRAGMENT_TAG, "Exactly How O_o!!!")
-//            }
-//        }
-
-
-        lifecycleScope.launch {
-            viewModel.popularMoviesResponseFlow
-                .collect { response ->
-                when(response) {
-                    is AppState.Loading -> activeLoadingMode()
-                    is AppState.Success -> {
-                        inActiveLoadingMode()
-                        initRecyclerView(response.data!!)
-                    }
-                    is AppState.Error -> {
-                        inActiveLoadingMode()
-                        toast(response.message.toString())
-                    }
-                }
-            }
         }
     }
 

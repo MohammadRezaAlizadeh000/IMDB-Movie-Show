@@ -9,15 +9,15 @@ import retrofit2.http.Path
 
 interface MoviesAPIService {
 
-    @GET("MostPopularMovies/{apiKey}")
+    @GET(HomeEndPointList.MOST_POPULAR_MOVIE)
     suspend fun getPopularMovies(
-        @Path("apiKey") apiKey: String = API_KEY
+        @Path(RequestParamKeys.API_KEY_PARAM_KEY) apiKey: String = API_KEY
     ): Response<PopularMoviesResponseModel>
 
-    @GET("Title/{apiKey}/{id}/Trailer")
+    @GET(SingleMovieEndpoints.SINGLE_MOVIE_DATA)
     suspend fun getSingleMovie(
-        @Path("id") movieId: String,
-        @Path("apiKey") apiKey: String = API_KEY
+        @Path(RequestParamKeys.ID_PARAM_KEY) movieId: String,
+        @Path(RequestParamKeys.API_KEY_PARAM_KEY) apiKey: String = API_KEY
     ): Response<SingleMovieResponseModel>
 
 }
